@@ -10,9 +10,9 @@ const app = express();
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 
-app.use('/posts', postRoutes);
-
 app.use(cors());
+
+app.use('/posts', postRoutes);
 
 const CONNECTION_URL = 'mongodb+srv://gabz_roberto:Gabriel10@cluster0.1kgbz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
 
