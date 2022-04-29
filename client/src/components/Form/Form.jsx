@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Typography, Button, Paper } from "@material-ui/core";
 import { useDispatch } from 'react-redux';
 import FileBase from 'react-file-base64';
+import { useSelector } from "react-redux";
 
-import { createPost } from "../../actions/posts";
+import { createPost, updatePost } from "../../actions/posts";
 import useStyles from "./styles";
 
-const Form = (props) => {
+const Form = ({ currentId, setCurrentId }) => {
   const [postData, setPostData] = useState({
     creator: "",
     title: "",
@@ -15,17 +16,38 @@ const Form = (props) => {
     selectedFile: "",
   });
 
+  const post = useSelector((state) => currentId ? state.posts.find((pst) => pst._id === currentId) : null);
+
   const classes = useStyles();
 
   const dispatch = useDispatch();
 
+  // preencher o formulário de edição
+  useEffect(() => {
+    if(post) { setPostData(post) }
+  }, [post])
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    dispatch(createPost(postData));
+    if(currentId) {
+      dispatch(updatePost(currentId, postData));
+    } else {
+      dispatch(createPost(postData));
+    }
+    clear();
   };
 
-  const clear = () => {}
+  const clear = () => {
+    setCurrentId(null);
+    setPostData({
+      creator: "",
+      title: "",
+      message: "",
+      tags: "",
+      selectedFile: "",
+    })
+  }
 
   return (
     <Paper className={classes.paper}>
@@ -36,7 +58,7 @@ const Form = (props) => {
         onSubmit={handleSubmit}
       >
         <Typography variant="h6">
-          Adicione um Momento
+          { currentId ? "Edite" : "Crie"} um Momento
         </Typography>
           <TextField name="creator" variant="outlined" label="Autor" fullWidth value={postData.creator} onChange={(event) => setPostData({ ...postData, creator: event.target.value })}/>
           <TextField name="title" variant="outlined" label="Título" fullWidth value={postData.title} onChange={(event) => setPostData({ ...postData, title: event.target.value })}/>
